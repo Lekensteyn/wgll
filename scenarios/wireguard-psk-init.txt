@@ -1,0 +1,21 @@
+# Matches the initiator handshake from wireguard-psk.pcap as included with the
+# Wireshark test suite.
+# You can also use zero here for a random port number.
+set_local '127.0.0.1' 41255
+set_remote '127.0.0.1' 51821
+Spub_r = 'YDCttCs9e1J52/g9vEnwJJa+2x6RqaayAYMpSVQfGEY='
+Epriv_i2 = 'iCv2VTi/BC/q0egU931KXrrQ4TSwXaezMgrhh7uCbXs='
+Spriv_i = 'AKeZaHwBxjiKLFnkY2unvEdOTtg4AL+M9dQXfopFVFk='
+time = 0x400000005b60ed663156716e
+psk2 = '//////////////////////////////////////////8='
+
+noise_init $Spub_r $Epriv_i2 $Spriv_i $time $psk2
+myinit = make_init sender=0xc1039c02
+send_init
+resp = wait_for_resp
+process_resp
+
+make_data_as_init receiver=$resp.sender
+send_data
+wait_for_data
+process_data_as_init

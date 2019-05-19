@@ -1,0 +1,19 @@
+# Matches the responder handshake from wireguard-psk.pcap as included with the
+# Wireshark test suite.
+set_local '127.0.0.1' 51821
+#set_remote '127.0.0.1' 41255
+Spriv_r = 'cFIxTUyBs1Qil414hBwEgvasEax8CKJ5IS5ZougplWs='
+Epriv_r2 = '8G1N3LnEqYC7+NW/b6mqceVUIGBMAZSm+IpwG1U0j0w='
+psk2 = '//////////////////////////////////////////8='
+
+noise_resp $Epriv_r2 $Spriv_r $psk2
+init = wait_for_init
+process_init
+make_resp sender=0xDCE3FA01
+send_resp
+wait_for_data
+process_data_as_resp
+
+make_data_as_resp receiver=$init.sender
+send_data
+print $MsgType4_0.enc_payload
