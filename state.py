@@ -66,21 +66,19 @@ class Storage:
         return obj
 
     def resolve(self, name):
+        '''Resolves an item name (or the item itself) to a matching item in this
+        storage.'''
         if name == None:
             assert self.instances, f'No previous instance found for {self.name}'
             return self.instances[-1]
+        if isinstance(name, self.spec):
+            name = name.name
         assert self.instances, f'No instances found for {name}'
         # XXX maybe this could split the name and directly use it as index.
         for instance in self.instances[::-1]:
             if instance.name == name:
                 return instance
         raise RuntimeError(f'Instance name {name} not found')
-
-    def find(self, fn):
-        for instance in self.instances[::-1]:
-            if fn(instance):
-                return instance
-        return None
 
 
 class Base:
