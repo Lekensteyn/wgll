@@ -1,0 +1,39 @@
+# Waits for a responder message and immediately transmits an initiation message
+# before finishing the first handshake.
+set_local '127.0.0.1' 1337
+Spriv_r = 'AKeZaHwBxjiKLFnkY2unvEdOTtg4AL+M9dQXfopFVFk='
+Epriv_r = '0G6t5j1B/We65MXVEBIGuRGYadwB2ITdvJovtAuATmc='
+
+    Epriv_i = 'iCv2VTi/BC/q0egU931KXrrQ4TSwXaezMgrhh7uCbXs='
+    Spriv_i = $Spriv_r
+    Spub_r = 'YDCttCs9e1J52/g9vEnwJJa+2x6RqaayAYMpSVQfGEY='
+    time = 0x400000005b60ee2000000000
+
+# Wait for an initiation message and prepare a response without sending it.
+noise_resp $Epriv_r $Spriv_r
+init = wait_for_init
+resp_state = process_init
+resp1 = make_resp sender=0xDCE3FA01
+
+    # Before sending a response, send a new initiation
+    noise_init $Spub_r $Epriv_i $Spriv_i $time
+    make_init sender=0xc1039c02
+    send_init
+
+# Finally send the data message.
+send_resp $resp1
+
+    # Not sure what will happen here, do we get transport data first or resp?
+    resp = wait_for_resp
+    process_resp
+    make_data_as_init receiver=$resp.sender
+    send_data
+
+print "CHECK"
+# Not sure if this even makes sense...
+wait_for_data
+process_data_as_init
+#process_data_as_resp
+
+make_data_as_resp receiver=$init.sender TsendR=$resp_state
+send_data
